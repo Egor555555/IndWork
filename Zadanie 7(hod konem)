@@ -1,0 +1,116 @@
+#include <iostream>
+#include <iomanip>
+#include <ctime>
+using namespace std;
+
+void Task(); // условие
+void FieldOutput(int(&Field)[10][10]); // вывод поля
+bool insideField(int x, int y); // пределы поля
+bool validStep(int x, int y, int start_x, int start_y, int(Field)[10][10]); // возможность хода
+
+int main()
+{
+    srand(time(NULL));
+    Task();
+
+    // ЗАПОЛНЕНИЕ МАССИВА
+    int Field[10][10];
+    int start_x = 0, start_y = 0, x, y, counter = 1; // стартовые координаты и счетчик для заполнения поля
+    for (int i = 0; i < 10; i++)
+        for (int j = 0; j < 10; j++)
+            Field[i][j] = Field[i][j] != Field[start_x][start_y] ? Field[i][j] = 0 : Field[i][j] = counter; // заполняем нулями все позиции, кроме стартовой
+
+    FieldOutput(Field);
+
+    bool status = true;
+    int Human = 0, Bot = 0;
+    int possibleX[8] = { 2, 1, -1, -2, -2, -1, 1, 2 }; // ходы конём
+    int possibleY[8] = { -1, -2, -2, -1, 1, 2, 2, 1 };
+
+    while (status == true)
+    {
+        cout << "Последнее число: " << counter << " ([" << start_x << "][" << start_y << "])" << endl << "Введите коодинаты [0-9][0-9] через пробел: ";
+        cin >> x >> y;
+
+        while (cin.fail() || !insideField(x, y) || validStep(x, y, start_x, start_y, Field) == false || Field[x][y] != 0) // обработка некорректного ввода
+        {
+            system("cls");
+            FieldOutput(Field);
+            cout << "Недопустимые координаты. Попробуйте снова" << endl << "Последнее число: " << counter << " ([" << start_x << "][" << start_y << "])"
+                << endl << "Введите коодинаты [0-9][0-9] через пробел: ";
+            cin.clear();
+            cin.ignore(32767, '\n');
+            cin >> x >> y;
+        }
+        Field[x][y] = ++counter; // присваиваем, увеличенный на единцу счетчик
+        start_x = x, start_y = y; // меняем стартовые позиции
+        system("cls");
+        FieldOutput(Field);
+        if (Field[x][y] <= counter) {
+            cout << "Игра окончена";
+        }
+
+        // ХОД КОМПЬЮТЕРА
+        bool b = true;
+        while ((Field[x][y] == Field[start_x][start_y]))
+        {
+            int x = rand() % 10, y = rand() % 10; // генерируется число
+            for (int j = 0; j < 8; j++)
+                if (validStep(x, y, start_x, start_y, Field)) // проверка возможности сделать ход конем
+                {
+                    Field[x][y] = ++counter; // присваиваем, увеличенный на единцу счетчик
+                    start_x = x, start_y = y; // меняем стартовые позиции
+                    system("cls");
+                    FieldOutput(Field);
+                    b = false;
+                }
+        }
+    }
+}
+
+void Task()
+{
+    setlocale(LC_ALL, "rus");
+    cout << "ХОД КОНЁМ" << endl << "На поле размером 10х10 пользователь и компьютер по очереди ставят числа от 1 до 100"
+        << endl << "Первое число ставится в левую верхнюю клетку. Дальше по порядку числа ставятся так, как ходит шахматный конь " << endl
+        << "Выигрывает тот, кто поставит последнее число и у противника больше не будет возможных ходов" << endl << endl;
+}
+
+void FieldOutput(int(&Field)[10][10])
+{
+    cout << "    ";
+    for (int i = 0; i < 10; i++)
+        cout << setw(3) << i << " ";
+    cout << endl << "      ";
+    for (int i = 0; i < 10; i++)
+        cout << "-   ";
+    cout << endl;
+
+    for (int i = 0; i < 10; i++)
+    {
+        cout << " " << i << " |";
+        for (int j = 0; j < 10; j++)
+            cout << setw(3) << Field[i][j] << " ";
+        cout << endl << endl;
+    }
+}
+
+bool insideField(int x, int y)
+{
+    return x >= 0 && x < 10 && y >= 0 && y < 10;
+}
+
+bool validStep(int x, int y, int start_x, int start_y, int(Field)[10][10])
+{
+    if (insideField(x, y))
+    {
+        int possibleX[8] = { 2, 1, -1, -2, -2, -1, 1, 2 };
+        int possibleY[8] = { -1, -2, -2, -1, 1, 2, 2, 1 };
+
+        for (int j = 0; j < 8; j++)
+            if (start_x + possibleX[j] == x && start_y + possibleY[j] == y && Field[start_x + possibleX[j]][start_y + possibleY[j]] == 0
+                && start_x + possibleX[j] < 10 && start_y + possibleY[j] < 10 && start_x + possibleX[j] >= 0 && start_y + possibleY[j] >= 0)
+                return true;
+        return false;
+    }
+}
