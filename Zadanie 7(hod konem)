@@ -36,34 +36,33 @@ int main()
         {
             system("cls");
             FieldOutput(Field);
-            cout << "Недопустимые координаты. Попробуйте снова" << endl << "Последнее число: " << counter << " ([" << start_x << "][" << start_y << "])"
-                << endl << "Введите коодинаты [0-9][0-9] через пробел: ";
+            cout << "Вы проиграли, так как ввели неправильные координаты или у вас не осталось возможных ходов. Попробуйте снова.";
             cin.clear();
             cin.ignore(32767, '\n');
-            cin >> x >> y;
         }
+        
         Field[x][y] = ++counter; // присваиваем, увеличенный на единцу счетчик
         start_x = x, start_y = y; // меняем стартовые позиции
         system("cls");
         FieldOutput(Field);
-        if (Field[x][y] <= counter) {
-            cout << "Игра окончена";
-        }
+        if (Field[x][y] <= counter)
+            cout << "Вы победили";
 
         // ХОД КОМПЬЮТЕРА
-        bool b = true;
+        bool b=false;
         while ((Field[x][y] == Field[start_x][start_y]))
         {
             int x = rand() % 10, y = rand() % 10; // генерируется число
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < 8; j++) {
                 if (validStep(x, y, start_x, start_y, Field)) // проверка возможности сделать ход конем
                 {
                     Field[x][y] = ++counter; // присваиваем, увеличенный на единцу счетчик
                     start_x = x, start_y = y; // меняем стартовые позиции
                     system("cls");
                     FieldOutput(Field);
-                    b = false;
+                    b = true;
                 }
+            }
         }
     }
 }
@@ -107,10 +106,11 @@ bool validStep(int x, int y, int start_x, int start_y, int(Field)[10][10])
         int possibleX[8] = { 2, 1, -1, -2, -2, -1, 1, 2 };
         int possibleY[8] = { -1, -2, -2, -1, 1, 2, 2, 1 };
 
-        for (int j = 0; j < 8; j++)
+        for (int j = 0; j < 8; j++) {
             if (start_x + possibleX[j] == x && start_y + possibleY[j] == y && Field[start_x + possibleX[j]][start_y + possibleY[j]] == 0
                 && start_x + possibleX[j] < 10 && start_y + possibleY[j] < 10 && start_x + possibleX[j] >= 0 && start_y + possibleY[j] >= 0)
                 return true;
+        }
         return false;
     }
 }
